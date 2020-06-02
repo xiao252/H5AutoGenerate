@@ -1,0 +1,170 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no">
+    <title></title>
+	<link rel="stylesheet" href="./css/animate.min.css">
+	<link rel="stylesheet" href="./css/loading.css">
+	<link rel="stylesheet" href="./css/main.css">
+	<link rel="stylesheet" href="./css/Slide.css">
+	<link rel="stylesheet" href="./css/weui.min.css">
+	<script src="./js/jquery-2.1.1.min.js"></script>
+	<!--<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>-->
+	<!--<script type="text/javascript" src="http://wx.gajxsh.com/api/weixin.share.php?t=1"></script>-->
+	<!-- <script type="text/javascript" src="//cdn.jsdelivr.net/npm/eruda"></script>
+	<script>eruda.init();</script> -->
+    <style>html{height: 100%;}body{overflow: hidden;}</style>
+</head>
+<body class="full" style="background-color: black">
+<div id="loader-wrapper">
+    <!--<div id="loader"></div>-->
+    <div class="logos">
+        <img src="./images/logo1.png" style="width: 100%;" alt="">
+    </div>
+    <div class="loader-section section-left"></div>
+    <div class="loader-section section-right"></div>
+</div>
+<div class="content">
+	<div style="background: url(./images/music.png?v=2) center / cover no-repeat;" id="musicPic"></div>
+	<div style="background: url(./images/nav.png?v=2) center / cover no-repeat;" id="next"></div>
+	<audio src="./media/music.mp3" crossOrigin="anonymous" id="music" style="visibility: hidden;" loop="loop" autoplay></audio>
+	<!--<img src="./images/return-btn.png?v=2" id="return" style="display: inline;position: absolute;left: 3%;top: 2%;width: 9%;z-index: 99;">-->
+	<div class="page-wrap" style="height:100%;">
+	{{content_html}}
+	</div>
+</div>
+<span id="copy" style="font-size: 6px;">技术支持：xxx</span>
+<span id="visit_count" style="position: absolute;right: 0%;bottom: 2%;color: #ffffff;font-size: 10px;z-index: 199;transform: scale(.6);"></span>
+<script src="./js/jweixin-1.6.0.js"></script>
+<script src="./js/share.js"></script>
+<script src="./js/Slide.js"></script>
+<script src="./js/weui.min.js"></script>
+<script src="./js/screen.js"></script>
+<script src="./js/pxloader-all.min.js"></script>
+<script src="./js/main.js"></script>
+<script type="text/javascript">
+	var resources = [{{resourcesTpl}}];
+	var loader = new PxLoader();
+    resources.forEach(function(item,index){
+        loader.addImage(location.origin+item);
+    })
+    loader.addProgressListener(function(e) { 
+        console.log(parseInt((e.completedCount / e.totalCount) * 100) + '%');
+    }); 
+    loader.addCompletionListener(function() {
+		$('.content').show();
+        run();
+    });
+	loader.start();
+	weixinShare();
+	function run(){
+		// screen({
+		// 	width:750,
+		// 	height:1500,
+		// 	isAuto:true,
+		// 	dom:'.page-wrap',
+		// 	bgColor:'#fefaee'
+		// });
+		window.slide = new Slide({
+			touchObj:".page-wrap",
+			speed: 0.7,
+			direction: 'vertical',
+			effect: 'flip',
+			loop: false,
+			pageId: 1,
+			allowTouch: true,
+			distance: 150,
+			musicSrc:'media/music.mp3',
+			isMusicData:false,
+		});
+		slide.addEventListener('loaded',function () {
+			$('body').addClass('loaded');
+		})
+		slide.addEventListener('animationStart',function () {
+		
+		})
+		slide.addEventListener('animationEnded',function () {
+			if(slide.pageId==slide.pageNum)
+			{
+				$('#next').hide();
+			}else {
+				$('#next').show();
+			}
+		})
+		slide.init();
+		document.addEventListener("touchmove",function(event){
+			event.preventDefault();
+		},{passive:false});
+		
+		slide.musicPlay();
+		document.addEventListener("WeixinJSBridgeReady", function () {
+			slide.musicPlay();
+		}, false);
+
+		$.weixinShare({
+			debug: false,
+			title: "title",
+			desc: "vice_title",
+			link: "http://54lions.com/H5/xxxxxx/xxxxxx/index.html",
+			imgUrl: "http://54lions.com/H5/xxxxxx/xxxxxx/images/ics.png"
+		});
+		$('title').html('title');
+		wx.ready(function() {
+			//wx.hideAllNonBaseMenuItem();
+			wx.hideMenuItems({
+				menuList: ["menuItem:copyUrl"]
+			});
+		});
+
+		$("#btn").on("touchend",function(){
+			insert();
+		})
+		$(document).keyup(function(event){
+			if(event.keyCode ==13){
+				insert();
+			}
+		});
+		var checktime = null;
+		function insert(){
+			clearTimeout(checktime);
+			checktime = setTimeout(function(){
+				var data = {
+					name:$('#name').val(),
+					tel : $('#tel').val(),
+					uduilian : $('#Ucouplets').val()||'未填写',
+					mduilian : getDulianText(duilian),
+					date : $('#beginTime div').html()
+				}
+				if(!(/^[\u4e00-\u9fa5]{2,5}$/.test(data.name))){
+					weui.topTips("姓名格式有误!");
+					return;
+				}
+				if(!(/^1([38][0-9]|4[579]|5[0-3,5-9]|6[6]|7[0135678]|9[89])\d{8}$/.test(data.tel))){
+					weui.topTips("手机号有误!");
+					return;
+				}
+				if(/[.'"-]/g.test(data.uduilian)){
+					weui.topTips("文字不能包含敏感字符！");
+					return;
+				}
+				if(data.date.length == 0){
+					weui.topTips("请选择日期");
+					return;
+				}
+				var loading = weui.loading('提交中...');
+				$.post("insert.php",data,function(data){
+					if(data.mun == 1){
+						weui.toast("提交成功!",2000);
+					}else{
+						weui.topTips("服务繁忙，请稍后重试...");
+					}
+					loading.hide();
+				},"json")
+			},300);
+		}
+	}
+    
+</script>
+</body>
+</html>
