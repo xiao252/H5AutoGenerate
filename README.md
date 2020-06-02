@@ -1,6 +1,6 @@
 # 使用
 
-1) 打开```test.psd```测试设计稿。
+1) 打开```test.psd```测试设计稿。 
 
 2) 文件-脚本-浏览，选择```run.jsx```执行。（其中‘runBG.jsx’‘runIMG.jsx’‘runWEBPACK.jsx’是三个不同生成模式，任选一即可）
 
