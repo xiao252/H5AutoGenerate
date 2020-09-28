@@ -1,10 +1,10 @@
 <?php
-    $pdo = new PDO("mysql:host=47.112.17.149:3306;dbname=h5","root","gcs20170309");//创建一个pdo对象
+    $pdo = new PDO("mysql:host=xx:3306;dbname=xx","xx","xx");//创建一个pdo对象
     $pdo->exec("set names 'utf8'");
 
-    $filename = "绿地|爱心巴士乘坐报名表";
-    $title = array("编号","姓名","手机号","城市","乘车日期","提交时间");
-    $emm = $pdo->prepare("select * from lvdi_20190117");
+    $filename = "表名";
+    $title = array("编号","姓名","手机号","城市");
+    $emm = $pdo->prepare("select * from xx");
     $emm->execute();  //执行一条预处理语句 .成功时返回 TRUE, 失败时返回 FALSE
     $data = $emm->fetchAll(PDO::FETCH_ASSOC);
     //var_dump($data)

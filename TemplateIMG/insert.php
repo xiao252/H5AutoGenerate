@@ -22,9 +22,9 @@ $name = $_POST['name'];
 $tel = $_POST['tel'];
 $city = $_POST['city'];
 $date = $_POST['date'];
-$pdo = new PDO("mysql:host=47.112.17.149:3306;dbname=h5","root","gcs20170309");//创建一个pdo对象
+$pdo = new PDO("mysql:host=xxx:3306;dbname=xx","xx","xx");//创建一个pdo对象
 $pdo->exec("set names 'utf8'");
-$stmt = $pdo->prepare("select * from lvdi_20190117 where tel=?");
+$stmt = $pdo->prepare("select * from xx where tel=?");
 $stmt->bindValue(1,$tel);
 $stmt->execute();  //执行一条预处理语句 .成功时返回 TRUE, 失败时返回 FALSE
 $rows = $stmt->fetchAll();
@@ -32,7 +32,7 @@ $row_count = $stmt->rowCount();
 if($row_count>0){
 	echo "{\"mun\":1}";
 }else{
-	$stmt = $pdo->prepare("insert into lvdi_20190117(name,tel,city,date)values(?,?,?,?)");
+	$stmt = $pdo->prepare("insert into xx(name,tel,city,date)values(?,?,?,?)");
 	$stmt->bindValue(1,addslashes($name));
 	$stmt->bindValue(2,addslashes($tel));
 	$stmt->bindValue(3,addslashes($city));
